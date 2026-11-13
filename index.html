@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0807">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0807'/%3E%3Cpath d='M16 6l2.6 6.2 6.7.5-5.1 4.4 1.6 6.6L16 20.4l-5.4 3.3 1.6-6.6-5.1-4.4 6.7-.5z' fill='%23c9a86a'/%3E%3C/svg%3E">
+<title>她们的长征 · 纪念中国工农红军长征胜利九十周年</title>
+<style>
+  :root{
+    --bg:#0a0807;
+    --paper:#e9dfcd;
+    --dim:rgba(233,223,205,.62);
+    --dim2:rgba(233,223,205,.34);
+    --gold:#c9a86a;
+    --gold-l:#e6cf9d;
+    --red:#b3352a;
+    --line:rgba(233,223,205,.13);
+    --serif:"Songti SC","STSong","Noto Serif SC","Source Han Serif SC","SimSun",serif;
+    --sans:"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    --bar:54px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;background:var(--bg);}
+  body{
+    font-family:var(--serif);color:var(--paper);
+    overflow:hidden;height:100vh;height:100dvh;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer;padding:0;}
+
+  /* ================= 外壳 ================= */
+  #app{
+    position:fixed;inset:0;display:flex;flex-direction:column;
+    background:var(--bg);
+  }
+  @media (min-width:640px){
+    #app{
+      max-width:520px;margin:0 auto;
+      border-left:1px solid rgba(233,223,205,.08);
+      border-right:1px solid rgba(233,223,205,.08);
+      box-shadow:0 0 80px rgba(0,0,0,.9);
+    }
+  }
+
+  /* 章节舞台 */
+  #stage{position:relative;flex:1;overflow:hidden;background:var(--bg);}
+  #stage iframe{
+    position:absolute;inset:0;width:100%;height:100%;border:0;
+    background:var(--bg);opacity:0;pointer-events:none;
+    transition:opacity .62s ease;
+  }
+  #stage iframe.on{opacity:1;pointer-events:auto;}
+
+  /* ================= 底部：继续前行（点击） ================= */
+  #nextHint{
+    position:absolute;right:13px;bottom:calc(70px + env(safe-area-inset-bottom,0px));
+    z-index:62;width:38px;height:38px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(10,8,7,.72);border:1px solid rgba(201,168,106,.28);
+    color:rgba(233,223,205,.6);
+    -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+    opacity:0;pointer-events:none;
+    transition:opacity .5s ease,transform .5s cubic-bezier(.22,.8,.25,1),color .3s,border-color .3s;
+  }
+  #nextHint.on{opacity:.92;pointer-events:auto;}
+  #nextHint:active{color:var(--gold-l);border-color:rgba(201,168,106,.7);}
+  #nextHint svg{width:15px;height:15px;animation:nudge 2.4s ease-in-out infinite;}
+  @keyframes nudge{0%,100%{transform:translateY(-1px)}50%{transform:translateY(3px)}}
+  #bar.on ~ #nextHint{opacity:0;pointer-events:none;}
+
+  /* ================= 底部章节条（默认收起） ================= */
+  #bar{
+    position:absolute;left:0;right:0;bottom:0;z-index:61;
+    height:var(--bar);height:calc(var(--bar) + env(safe-area-inset-bottom,0px));
+    padding-bottom:env(safe-area-inset-bottom,0px);
+    display:flex;align-items:center;
+    background:rgba(9,7,6,.94);
+    border-top:1px solid var(--line);
+    backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+    transform:translateY(110%);
+    transition:transform .5s cubic-bezier(.22,.8,.25,1);
+  }
+  #bar.on{transform:none;}
+  #bar::before{
+    content:"";position:absolute;left:0;right:0;top:-26px;height:26px;
+    background:linear-gradient(to bottom,transparent,rgba(9,7,6,.9));
+    pointer-events:none;
+  }
+
+  /* 最底部：极淡的章节刻度，即是唯一常驻的导航入口 */
+  #handle{
+    position:absolute;left:0;right:0;bottom:0;
+    height:calc(12px + env(safe-area-inset-bottom,0px));
+    padding-bottom:calc(4px + env(safe-area-inset-bottom,0px));
+    z-index:63;
+    display:flex;align-items:flex-end;justify-content:center;gap:5px;
+    opacity:0;transition:opacity .45s;
+  }
+  #handle.on{opacity:.9;}
+  #handle i{
+    display:block;width:11px;height:2px;border-radius:1px;
+    background:rgba(233,223,205,.3);transition:.4s;
+  }
+  #handle i.on{width:20px;background:rgba(201,168,106,.75);}
+  #handle:active i{background:rgba(233,223,205,.5);}
+
+  .nav-btn{
+    width:54px;height:100%;display:flex;align-items:center;justify-content:center;
+    color:rgba(233,223,205,.4);transition:.3s;flex:0 0 auto;
+  }
+  .nav-btn:active{color:var(--gold);}
+  .nav-btn[disabled]{opacity:.18;pointer-events:none;}
+  .nav-btn svg{width:15px;height:15px;}
+
+  #chapBtn{
+    flex:1;height:100%;display:flex;align-items:center;justify-content:center;gap:11px;
+    min-width:0;
+  }
+  #chapBtn .no{
+    font-family:Georgia,serif;font-size:12px;color:var(--gold);
+    letter-spacing:.06em;flex:0 0 auto;
+  }
+  #chapBtn .nm{
+    font-size:13px;letter-spacing:.16em;color:var(--paper);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  #chapBtn .dots{display:flex;gap:5px;align-items:center;margin-left:4px;flex:0 0 auto;}
+  #chapBtn .dots i{
+    width:3px;height:3px;border-radius:50%;background:rgba(233,223,205,.22);
+    transition:.3s;
+  }
+  #chapBtn .dots i.on{background:var(--gold);box-shadow:0 0 6px rgba(201,168,106,.7);}
+
+  /* ================= 音乐按钮 ================= */
+  #mute{
+    width:46px;height:100%;flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;
+    color:rgba(201,168,106,.75);position:relative;
+    transition:color .3s;
+  }
+  #mute:active{color:var(--gold-l);}
+  #mute svg{width:17px;height:17px;}
+  #mute.playing{color:rgba(201,168,106,.95);}
+
+  /* ================= 目录 ================= */
+  #menu{
+    position:absolute;inset:0;z-index:69;
+    display:flex;align-items:flex-end;
+    background:rgba(4,3,3,.6);backdrop-filter:blur(3px);
+    opacity:0;pointer-events:none;transition:opacity .34s;
+  }
+  #menu.on{opacity:1;pointer-events:auto;}
+  #menu .sheet{
+    width:100%;background:#0d0a08;
+    border-top:1px solid rgba(201,168,106,.28);
+    padding:24px 22px calc(28px + env(safe-area-inset-bottom,0px));
+    transform:translateY(18px);transition:transform .38s cubic-bezier(.22,.8,.25,1);
+  }
+  #menu.on .sheet{transform:none;}
+  #menu .m-title{
+    font-family:var(--sans);font-size:10px;letter-spacing:.3em;
+    color:var(--dim2);margin-bottom:18px;
+  }
+  #menu .m-list{display:flex;flex-direction:column;}
+  #menu .m-item{
+    display:flex;align-items:baseline;gap:14px;
+    padding:13px 2px;border-bottom:1px solid rgba(233,223,205,.07);
+    text-align:left;transition:.28s;
+  }
+  #menu .m-item:last-child{border-bottom:none;}
+  #menu .m-item .no{
+    font-family:Georgia,serif;font-size:11px;color:rgba(201,168,106,.5);flex:0 0 22px;
+  }
+  #menu .m-item .nm{font-size:14px;letter-spacing:.14em;color:rgba(233,223,205,.72);}
+  #menu .m-item .sb{
+    margin-left:auto;font-family:var(--sans);font-size:9.5px;
+    letter-spacing:.14em;color:rgba(233,223,205,.26);
+  }
+  #menu .m-item.cur{background:rgba(201,168,106,.07);padding-left:8px;border-radius:2px;}
+  #menu .m-item.cur .no{color:var(--gold);}
+  #menu .m-item.cur .nm{color:var(--gold-l);}
+  #menu .m-item.cur .sb{color:rgba(233,223,205,.45);}
+  #menu .m-item:active{background:rgba(201,168,106,.06);}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation-duration:.01ms !important;transition-duration:.01ms !important;}
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="stage"><!-- iframe 由脚本注入 --></div>
+
+  <div id="bar">
+    <button class="nav-btn" id="prev" aria-label="上一章">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 5L8.5 12 15 19" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button id="chapBtn" aria-label="打开目录">
+      <span class="no">01</span>
+      <span class="nm">长征有她</span>
+      <span class="dots"><i class="on"></i><i></i><i></i><i></i><i></i></span>
+    </button>
+    <button class="nav-btn" id="next" aria-label="下一章">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5l6.5 7L9 19" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <button id="mute" aria-label="背景音乐开关">
+      <svg id="icoOn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+        <path d="M9 17.6V6.4l9-2v11.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="6.6" cy="17.9" r="2.5"/><circle cx="15.6" cy="15.6" r="2.5"/>
+      </svg>
+      <svg id="icoOff" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" style="display:none">
+        <path d="M9 17.6V6.4l9-2v11.2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="6.6" cy="17.9" r="2.5"/><circle cx="15.6" cy="15.6" r="2.5"/>
+        <path d="M4.6 20L19.8 4.2" stroke-linecap="round"/>
+      </svg>
+    </button>
+  </div>
+
+  <button id="nextHint" aria-label="进入下一板块" title="继续前行">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+
+  <div id="handle" role="button" tabindex="0" aria-label="展开章节导航">
+    <i class="on"></i><i></i><i></i><i></i><i></i>
+  </div>
+
+  <div id="menu">
+    <div class="sheet">
+      <div class="m-title">全篇目录 · 共五章</div>
+      <div class="m-list" id="mList"></div>
+    </div>
+  </div>
+</div>
+
+<audio id="bgm" src="audio/bgm.mp3" preload="auto" loop></audio>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============ 章节配置 ============ */
+  var CH = [
+    { no: "01", name: "长征有她",   sub: "序",                 file: "chapters/01-intro/index.html",   vol: 0.42 },
+    { no: "02", name: "战士画像",   sub: "一支年轻的队伍",      file: "chapters/02-portrait/index.html", vol: 0.42 },
+    { no: "03", name: "六位女红军", sub: "一件物件 · 一个人",   file: "chapters/03-six/index.html",      vol: 0.26 },
+    { no: "04", name: "她接力",     sub: "一代人有一代人的长征", file: "chapters/04-relay/index.html",    vol: 0.40 },
+    { no: "05", name: "影像与结语", sub: "从山道到远方",        file: "chapters/05-ending/index.html",   vol: 0.08 }
+  ];
+
+  var stage   = document.getElementById("stage");
+  var bar     = document.getElementById("bar");
+  var chapBtn = document.getElementById("chapBtn");
+  var prevBtn = document.getElementById("prev");
+  var nextBtn = document.getElementById("next");
+  var muteBtn = document.getElementById("mute");
+  var icoOn   = document.getElementById("icoOn");
+  var icoOff  = document.getElementById("icoOff");
+  var menu    = document.getElementById("menu");
+  var mList   = document.getElementById("mList");
+  var bgm     = document.getElementById("bgm");
+  var handle  = document.getElementById("handle");
+  var nextHint = document.getElementById("nextHint");
+
+  var frames = [];
+  var cur = -1;
+  var lastGo = 0;
+
+  /* ============ 生成 iframe ============ */
+  CH.forEach(function (ch, i) {
+    var f = document.createElement("iframe");
+    f.setAttribute("title", ch.name);
+    f.setAttribute("allow", "autoplay; fullscreen");
+    f.setAttribute("scrolling", "yes");
+    stage.appendChild(f);
+    frames.push(f);
+    f.addEventListener("load", function () {
+      f.dataset.loaded = "1";
+      if (i === cur) f.classList.add("on");
+    });
+  });
+
+  /* ============ 目录 ============ */
+  CH.forEach(function (ch, i) {
+    var b = document.createElement("button");
+    b.className = "m-item";
+    b.innerHTML = '<span class="no">' + ch.no + '</span>' +
+                  '<span class="nm">' + ch.name + '</span>' +
+                  '<span class="sb">' + ch.sub + '</span>';
+    b.addEventListener("click", function () {
+      menu.classList.remove("on");
+      setTimeout(function () { go(i); }, 160);
+    });
+    mList.appendChild(b);
+  });
+  var mItems = mList.querySelectorAll(".m-item");
+
+  menu.addEventListener("click", function (e) {
+    if (e.target === menu) menu.classList.remove("on");
+  });
+  chapBtn.addEventListener("click", function () { menu.classList.toggle("on"); });
+
+  /* ============ 音乐 ============ */
+  var audioOn = true;
+  var audioStarted = false;
+  var ducked = false;             // 章内特殊音效占用（如《国际歌》）
+  var targetVol = CH[0].vol;
+  var fadeTimer = null;
+
+  function fadeTo(v, ms, done) {
+    if (fadeTimer) { clearInterval(fadeTimer); fadeTimer = null; }
+    var from = bgm.volume, t0 = Date.now();
+    ms = Math.max(1, ms);
+    fadeTimer = setInterval(function () {
+      var k = Math.min(1, (Date.now() - t0) / ms);
+      bgm.volume = Math.max(0, Math.min(1, from + (v - from) * k));
+      if (k >= 1) {
+        clearInterval(fadeTimer); fadeTimer = null;
+        if (done) done();
+      }
+    }, 40);
+  }
+
+  function syncAudio() {
+    if (!audioOn || !audioStarted || ducked) return;
+    if (bgm.paused) {
+      bgm.volume = 0;
+      var p = bgm.play();
+      if (p && p.then) {
+        p.then(function () {
+          muteBtn.classList.add("playing");
+          fadeTo(targetVol, 1800);
+        }).catch(function () { muteBtn.classList.remove("playing"); });
+      } else {
+        muteBtn.classList.add("playing");
+        fadeTo(targetVol, 1800);
+      }
+    } else {
+      fadeTo(targetVol, 1200);
+    }
+  }
+
+  function startAudio() {
+    if (audioStarted || !audioOn) return;
+    audioStarted = true;
+    syncAudio();
+  }
+
+  function duck() {                  // 背景音乐暂时停止
+    ducked = true;
+    if (bgm.paused) { muteBtn.classList.remove("playing"); return; }
+    fadeTo(0, 650, function () {
+      try { bgm.pause(); } catch (e) {}
+      muteBtn.classList.remove("playing");
+    });
+  }
+
+  function unduck() {                // 进入下一个页面后自动恢复
+    ducked = false;
+    syncAudio();
+  }
+
+  muteBtn.addEventListener("click", function () {
+    audioOn = !audioOn;
+    if (audioOn) {
+      icoOn.style.display = "";
+      icoOff.style.display = "none";
+      if (!audioStarted) { audioStarted = true; }
+      ducked = false;
+      syncAudio();
+    } else {
+      icoOn.style.display = "none";
+      icoOff.style.display = "";
+      muteBtn.classList.remove("playing");
+      if (fadeTimer) { clearInterval(fadeTimer); fadeTimer = null; }
+      bgm.pause();
+    }
+  });
+
+  /* ============ 底部条 ============ */
+  var barTimer = null;
+  function showBar(stay) {
+    bar.classList.add("on");
+    handle.classList.remove("on");
+    if (barTimer) clearTimeout(barTimer);
+    if (!stay) barTimer = setTimeout(hideBar, 4200);
+  }
+  function hideBar() {
+    bar.classList.remove("on");
+    handle.classList.add("on");
+    if (barTimer) { clearTimeout(barTimer); barTimer = null; }
+  }
+  handle.addEventListener("click", function () { showBar(); });
+  handle.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); showBar(); }
+  });
+  ["touchstart", "mousedown"].forEach(function (ev) {
+    bar.addEventListener(ev, function () {
+      if (barTimer) clearTimeout(barTimer);
+      barTimer = setTimeout(hideBar, 6000);
+    }, { passive: true });
+  });
+
+  function updateUI() {
+    var ch = CH[cur];
+    chapBtn.querySelector(".no").textContent = ch.no;
+    chapBtn.querySelector(".nm").textContent = ch.name;
+
+    var dots = chapBtn.querySelectorAll(".dots i");
+    for (var k = 0; k < dots.length; k++) dots[k].classList.toggle("on", k === cur);
+    for (var m = 0; m < mItems.length; m++) mItems[m].classList.toggle("cur", m === cur);
+
+    var hs = handle.querySelectorAll("i");
+    for (var j = 0; j < hs.length; j++) hs[j].classList.toggle("on", j === cur);
+
+    prevBtn.disabled = cur <= 0;
+    nextBtn.disabled = cur >= CH.length - 1;
+    if (cur >= CH.length - 1) nextHint.classList.remove("on");
+  }
+
+  /* ============ 切章 ============ */
+  function postTo(i, type) {
+    if (i < 0 || !frames[i]) return;
+    try { frames[i].contentWindow.postMessage({ type: type }, "*"); } catch (e) {}
+  }
+
+  function go(idx) {
+    if (idx < 0 || idx >= CH.length) return;
+    if (idx === cur) return;
+
+    var old = cur;
+    var f = frames[idx];
+    var first = !f.dataset.loaded;
+
+    if (old >= 0) {
+      frames[old].classList.remove("on");
+      postTo(old, "leave");
+    }
+    f.classList.add("on");
+    if (first) f.src = CH[idx].file;
+
+    cur = idx;
+    lastGo = Date.now();
+    updateUI();
+    showBar();
+    nextHint.classList.remove("on");
+
+    targetVol = CH[idx].vol;
+    if (ducked) unduck(); else syncAudio();
+
+    postTo(idx, "enter");
+    /* 每次进入板块都回到该板块第一页，避免“从中间接着看”的混乱 */
+    postTo(idx, "reset");
+    setTimeout(function () { if (cur === idx) postTo(idx, "reset"); }, 320);
+  }
+
+  /* ============ 从头再走一遍 ============ */
+  function restartAll() {
+    for (var i = 0; i < frames.length; i++) postTo(i, "reset");
+    if (ducked) unduck();
+    nextHint.classList.remove("on");
+    if (cur !== 0) {
+      go(0);
+    } else {
+      postTo(0, "reset");
+      showBar();
+    }
+  }
+
+  prevBtn.addEventListener("click", function () { go(cur - 1); });
+  nextBtn.addEventListener("click", function () { go(cur + 1); });
+  nextHint.addEventListener("click", function () { go(cur + 1); });
+
+  /* ============ 章内消息 ============ */
+  window.addEventListener("message", function (e) {
+    var d = e.data;
+    if (!d || !d.type) return;
+    /* 只接受当前板块的消息，避免切章瞬间的串扰 */
+    if (frames[cur] && e.source && e.source !== frames[cur].contentWindow) return;
+    switch (d.type) {
+      case "gesture":      startAudio(); break;
+      case "next":
+      case "chapter-next":
+        if (Date.now() - lastGo > 1000) go(cur + 1);
+        break;
+      case "prev":
+        if (Date.now() - lastGo > 1000) go(cur - 1);
+        break;
+      case "restart":
+        if (Date.now() - lastGo > 800) restartAll();
+        break;
+      case "bgm-pause":    duck(); break;
+      case "bgm-resume":   unduck(); break;
+      case "at-end":
+        if (cur < CH.length - 1) nextHint.classList.add("on");
+        break;
+      case "at-mid":
+        nextHint.classList.remove("on");
+        break;
+    }
+  });
+
+  /* 首次交互起播 */
+  document.addEventListener("pointerdown", function (e) {
+    if (muteBtn.contains(e.target)) return;
+    startAudio();
+  }, true);
+
+  /* 键盘（桌面） */
+  document.addEventListener("keydown", function (e) {
+    if (menu.classList.contains("on")) return;
+    if (e.key === "ArrowRight") go(cur + 1);
+    if (e.key === "ArrowLeft") go(cur - 1);
+  });
+
+  /* ============ 启动：直接进入第一板块 ============ */
+  cur = -1;
+  go(0);
+  handle.classList.add("on");
+  if (barTimer) clearTimeout(barTimer);
+  barTimer = setTimeout(hideBar, 3600);
+})();
+</script>
+</body>
+</html>

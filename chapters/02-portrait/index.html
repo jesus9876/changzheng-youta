@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
+<meta name="theme-color" content="#0a0807">
+<meta name="description" content="从一支年轻的队伍，到队伍里的她们。">
+<title>战士画像｜她们的长征</title>
+<link rel="preload" href="assets/ai-portrait.jpg" as="image">
+<link rel="preload" href="assets/ai-women-group.jpg" as="image">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="grain" aria-hidden="true"></div>
+<div class="progress"><i id="bar"></i></div>
+
+<main class="deck" id="deck">
+
+  <!-- 全局背景（跨屏连续，不随翻页重置） -->
+  <div class="bg-fixed" aria-hidden="true"><img src="assets/bg-route.jpg" alt=""></div>
+
+  <!-- ================= 第一屏 · 战士画像（他们） ================= -->
+  <section class="page p1" id="s1" aria-labelledby="s1Title">
+    <div class="dust"></div>
+
+    <div class="stage">
+      <div class="hero-top">
+        <h1 class="rv" style="--d:.28s" id="s1Title">一支年轻的队伍，<em>走出两万五千里。</em></h1>
+        <p class="hero-sub rv" style="--d:.44s">他们大多不到二十岁。</p>
+      </div>
+
+      <!-- 肖像（画框装裱） + 热区自动走位 -->
+      <div class="portrait-band rv" style="--d:.32s">
+        <div class="portrait-frame" id="portraitFrame">
+          <figure class="portrait">
+            <img id="portraitImg" src="assets/ai-portrait.jpg" width="1024" height="1443" decoding="async" alt="AI 生成的青年红军战士形象">
+            <figcaption>AI 情景再现 · 非历史照片</figcaption>
+            <div class="portrait-mask" aria-hidden="true"></div>
+
+            <div class="hotzones" id="hotzones" role="group" aria-label="画像档案热区">
+              <button class="hotzone hotzone--young" type="button" data-hot="young" aria-pressed="false" tabindex="-1">
+                <span class="hotzone__ring"></span><span class="hotzone__mark"></span><span class="hotzone__label">年轻</span>
+              </button>
+              <button class="hotzone hotzone--figure" type="button" data-hot="figure" aria-pressed="false" tabindex="-1">
+                <span class="hotzone__ring"></span><span class="hotzone__mark"></span><span class="hotzone__label">身影</span>
+              </button>
+              <button class="hotzone hotzone--gear" type="button" data-hot="gear" aria-pressed="false" tabindex="-1">
+                <span class="hotzone__ring"></span><span class="hotzone__mark"></span><span class="hotzone__label">行装</span>
+              </button>
+            </div>
+          </figure>
+        </div>
+        <p class="portrait-copy" id="portraitCopy" aria-live="polite">战斗员平均年龄不足 20 岁。</p>
+      </div>
+
+      <!-- 年龄行军尺 -->
+      <div class="ageruler rv" style="--d:.55s">
+        <p class="ageruler__tip">把你的年龄，放进这支队伍</p>
+
+        <div class="ageruler__figures" aria-hidden="true">
+          <span class="afig" data-i="0"></span><span class="afig" data-i="1"></span>
+          <span class="afig" data-i="2"></span><span class="afig" data-i="3"></span>
+          <span class="afig" data-i="4"></span><span class="afig" data-i="5"></span>
+          <span class="afig" data-i="6"></span><span class="afig" data-i="7"></span>
+          <span class="afig" data-i="8"></span><span class="afig" data-i="9"></span>
+        </div>
+        <p class="ageruler__note">比例示意，非真实名单</p>
+
+        <div class="ageruler__anchors" id="anchors">
+          <span class="anchor is-zone" data-lo="14" data-hi="18">14—18 岁 · 至少占 40%</span>
+          <span class="anchor" data-at="20">战斗员 · 平均不足 20 岁</span>
+          <span class="anchor" data-at="25">指挥员 · 平均不足 25 岁</span>
+          <span class="anchor" data-at="28">吴焕先 · 牺牲时 28 岁</span>
+        </div>
+
+        <div class="ageruler__track" id="agerulerTrack">
+          <div class="ageruler__fill" id="agerulerFill"></div>
+          <span class="ageruler__tick" style="left:30%"></span>
+          <span class="ageruler__tick" style="left:50%"></span>
+          <span class="ageruler__tick" style="left:70%"></span>
+          <span class="ageruler__tick" style="left:90%"></span>
+          <input type="range" id="ageRange" min="14" max="30" value="18" step="1"
+                 aria-label="年龄行军尺，把你的年龄放进这支队伍" aria-valuetext="18 岁">
+          <span class="ageruler__thumb" id="ageThumb" aria-hidden="true"><span>你</span></span>
+        </div>
+
+        <div class="ageruler__readout">
+          <span class="ageruler__age" id="ageNum">18</span><span class="ageruler__unit">岁</span>
+          <span class="ageruler__ratio" id="ageRatio" hidden>
+            <span class="ageruler__ratio-bar"><i id="ageRatioFill"></i></span>
+            <span class="ageruler__ratio-txt" id="ageRatioTxt">14—18 岁战士至少占 40%</span>
+          </span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- 向下引导（固定在第一屏底部，两屏交界处） -->
+    <div class="scroll-hint rv" style="--d:.82s"><span></span>向下</div>
+  </section>
+
+  <!-- ================= 第二屏 · 擦开尘封（从他们到她们） ================= -->
+  <section class="page p2" id="s2" aria-labelledby="s2Title">
+    <div class="dust"></div>
+
+    <div class="stage">
+      <!-- 过渡句（第二屏开场） -->
+      <div class="trans-up rv" id="transUp" style="--d:.05s">
+        <p class="trans-line">这支队伍里，有一些身影，<em>似乎和你想的不太一样。</em></p>
+      </div>
+
+      <!-- 擦灰提示（画框上方，随擦灰进度淡出） -->
+      <div class="wipe-hint" id="wipeHint">
+        <span class="wipe-hint__hand" aria-hidden="true">👆</span>
+        <span id="wipeHintText">擦开尘封</span>
+      </div>
+
+      <!-- 擦灰舞台：底图为女红军群像，灰尘蒙层盖住，擦灰揭晓 -->
+      <div class="wipe-wrap">
+        <div class="wipe-frame">
+          <!-- 档案挂绳 -->
+          <span class="frame-hook" aria-hidden="true"></span>
+          <!-- 四角金色包角 -->
+          <i class="corner corner--tl" aria-hidden="true"></i>
+          <i class="corner corner--tr" aria-hidden="true"></i>
+          <i class="corner corner--bl" aria-hidden="true"></i>
+          <i class="corner corner--br" aria-hidden="true"></i>
+
+          <div class="wipe-stage" id="wipeStage">
+            <img class="wipe-base" id="wipeBase" src="assets/ai-women-group.jpg" alt="AI 生成的女红军战士群像" aria-hidden="true">
+            <div class="wipe-base-veil" aria-hidden="true"></div>
+            <canvas id="wipeCanvas" aria-label="擦开尘封，看这支队伍里的她们"></canvas>
+            <!-- 擦除光晕 -->
+            <div class="wipe-glow" aria-hidden="true"></div>
+          </div>
+
+          <!-- 擦除进度环 -->
+          <div class="wipe-progress" aria-hidden="true">
+            <svg viewBox="0 0 44 44">
+              <circle class="wp-bg" cx="22" cy="22" r="18"></circle>
+              <circle class="wp-fg" id="wipeProgressRing" cx="22" cy="22" r="18"></circle>
+            </svg>
+            <span class="wp-pct" id="wipePct">0</span>
+          </div>
+        </div>
+
+        <!-- 擦灰过程文案（画框下方，擦一会儿才浮现） -->
+        <p class="wipe-caption" id="wipeCaption" aria-live="polite"></p>
+
+        <!-- 重新擦按钮（擦到接近完成时出现） -->
+        <button class="wipe-reset" id="wipeReset" type="button" aria-label="重新擦一遍">重新擦一遍</button>
+      </div>
+
+      <!-- 队伍剪影行进带（底部氛围，与第一屏呼应） -->
+      <div class="march-line" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span><span></span>
+      </div>
+
+      <!-- CTA（文字下方，下滑到位置才弹出） -->
+      <div class="handoff" id="handoff">
+        <div class="wipe-cta" id="wipeCta" aria-hidden="true">
+          <a class="cta" id="nextBtn" href="#">走进她们的故事 <span>→</span></a>
+          <p class="handoff__note">继续 · 六件物件</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<nav class="dots" id="dotNav" aria-label="章节导航"></nav>
+
+<!-- 史料来源入口（底部） -->
+<button class="src-entry" id="srcEntry" type="button" aria-label="查看史料来源">史料来源</button>
+
+<!-- 来源弹层（深色轻量） -->
+<div class="ov" id="ov" role="dialog" aria-modal="true" aria-labelledby="ovTitle" aria-hidden="true">
+  <button class="ov-close" id="ovClose" aria-label="关闭">×</button>
+  <div class="ov-in">
+    <p class="ov-k">史料口径</p>
+    <h3 class="ov-title" id="ovTitle">本页史料口径与来源</h3>
+    <div class="ov-body" id="ovBody"></div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+/* ===== 板块串联桥（自动注入）：滑到底 → 下一板块；到顶继续上滑 → 上一板块；重置回本篇第一页 ===== */
+(function () {
+  "use strict";
+  var framed = false;
+  try { framed = window.self !== window.top; } catch (e) { framed = false; }
+
+  function post(t) { if (!framed) return; try { parent.postMessage({ type: t }, "*"); } catch (e) {} }
+
+  /* ---- 首次交互：通知外壳起播背景音乐 ---- */
+  var gested = false;
+  function gest() { if (gested) return; gested = true; post("gesture"); }
+  document.addEventListener("touchstart", gest, { passive: true });
+  document.addEventListener("pointerdown", gest, { passive: true });
+
+  /* ---- 滚动容器判定 ---- */
+  function scrollable(el) {
+    if (!el) return false;
+    var cs = getComputedStyle(el);
+    var ox = /(auto|scroll)/.test(cs.overflowX), oy = /(auto|scroll)/.test(cs.overflowY);
+    return (ox && el.scrollWidth > el.clientWidth + 4) || (oy && el.scrollHeight > el.clientHeight + 4);
+  }
+  function primary() {
+    var c = document.getElementById("book");
+    var d = document.getElementById("deck");
+    if (scrollable(c)) return c;
+    if (scrollable(d)) return d;
+    return document.scrollingElement || document.documentElement;
+  }
+  function isHoriz(el) {
+    var cs = getComputedStyle(el);
+    return /(auto|scroll)/.test(cs.overflowX) &&
+           el.scrollWidth > el.clientWidth + 4 &&
+           el.scrollHeight <= el.clientHeight + 4;
+  }
+  function maxOf(el) {
+    if (isHoriz(el)) return { pos: el.scrollLeft, max: el.scrollWidth - el.clientWidth };
+    return { pos: el.scrollTop, max: el.scrollHeight - el.clientHeight };
+  }
+  function ready() {
+    return document.readyState !== "loading" &&
+           document.body && document.body.scrollHeight > window.innerHeight * 0.6;
+  }
+  function moreToGo() {
+    if (!ready()) return true;
+    var list = [primary()];
+    var extra = document.querySelectorAll(".stage, .page");
+    for (var i = 0; i < extra.length; i++) {
+      var s = extra[i], r = s.getBoundingClientRect();
+      var onScreen = r.bottom > 20 && r.top < window.innerHeight - 20 &&
+                     r.right > 20 && r.left < window.innerWidth - 20;
+      if (onScreen && scrollable(s)) list.push(s);
+    }
+    for (var j = 0; j < list.length; j++) {
+      var m = maxOf(list[j]);
+      if (m.max > 6 && m.pos < m.max - 8) return true;
+    }
+    return false;
+  }
+  /* ---- 是否已经在本篇最前 ---- */
+  function atStart() {
+    if (!ready()) return false;
+    var p = primary(), m = maxOf(p);
+    if (m.max <= 6) return window.scrollY <= 6;
+    return m.pos <= 8;
+  }
+
+  /* ---- 状态上报 ---- */
+  var atEnd = null;
+  function pushState() {
+    var v = !moreToGo();
+    if (v !== atEnd) { atEnd = v; post(v ? "at-end" : "at-mid"); }
+  }
+  var throttle = false;
+  function onScroll() {
+    if (throttle) return;
+    throttle = true;
+    requestAnimationFrame(function () { pushState(); throttle = false; });
+  }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  document.addEventListener("scroll", onScroll, { passive: true, capture: true });
+  window.addEventListener("resize", onScroll);
+
+  /* ---- 触发下一 / 上一板块（带冷却） ---- */
+  var lastFire = 0, lastPrev = 0, born = Date.now();
+  function fire() {
+    if (moreToGo()) return;
+    var now = Date.now();
+    if (now - born < 900) return;
+    if (now - lastFire < 1400) return;
+    lastFire = now;
+    post("next");
+  }
+  function firePrev() {
+    if (!atStart()) return;
+    var now = Date.now();
+    if (now - born < 900) return;
+    if (now - lastPrev < 1400) return;
+    lastPrev = now;
+    post("prev");
+  }
+
+  /* ---- 鼠标滚轮：向下到底 → 下一板块；在顶端向上 → 上一板块 ---- */
+  var acc = 0, accT = 0, upAcc = 0, upT = 0;
+  document.addEventListener("wheel", function (e) {
+    var now = Date.now();
+    if (atStart()) {
+      var u = Math.max(0, -e.deltaY) + (e.deltaX < 0 ? -e.deltaX : 0);
+      if (u > 0) {
+        if (now - upT > 700) upAcc = 0;
+        upT = now; upAcc += u;
+        if (upAcc > 150) { upAcc = 0; firePrev(); }
+        return;
+      }
+    }
+    if (moreToGo()) { acc = 0; return; }
+    var d = Math.max(0, e.deltaY) + (e.deltaX > 0 ? e.deltaX : 0);
+    if (d <= 0) return;
+    if (now - accT > 700) acc = 0;
+    accT = now; acc += d;
+    if (acc > 140) { acc = 0; fire(); }
+  }, { passive: true });
+
+  /* ---- 触摸：向上滑到底 → 下一板块；到顶继续下拉 → 上一板块 ---- */
+  var sx = 0, sy = 0, tracking = false, startTop = false;
+  document.addEventListener("touchstart", function (e) {
+    if (e.touches.length !== 1) return;
+    tracking = true; sx = e.touches[0].clientX; sy = e.touches[0].clientY;
+    startTop = atStart();
+  }, { passive: true });
+  document.addEventListener("touchend", function (e) {
+    if (!tracking) return;
+    tracking = false;
+    var t = e.changedTouches && e.changedTouches[0];
+    if (!t) return;
+    var dx = sx - t.clientX, dy = sy - t.clientY;
+    if (startTop && atStart() && dy < -70 && Math.abs(dy) > Math.abs(dx)) {
+      firePrev();
+      return;
+    }
+    var far = isHoriz(primary()) ? (dx > 60 && dx > Math.abs(dy)) : (dy > 80 && dy > Math.abs(dx));
+    if (!far) return;
+    setTimeout(fire, 60);
+  }, { passive: true });
+
+  /* ---- 键盘 ---- */
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowDown" || e.key === "PageDown") { if (!moreToGo()) fire(); }
+    if (e.key === "ArrowUp" || e.key === "PageUp") { if (atStart()) firePrev(); }
+    if (e.key === "ArrowLeft" && isHoriz(primary()) && !moreToGo()) fire();
+  });
+
+  /* ---- 回到本篇第一页 ---- */
+  function resetAll() {
+    if (typeof window.__onReset === "function") {
+      try { window.__onReset(); } catch (e) {}
+    }
+    try { window.scrollTo(0, 0); } catch (e) {}
+    var bk = document.getElementById("book"), dk = document.getElementById("deck");
+    [bk, dk].forEach(function (el) {
+      if (!el) return;
+      try { el.scrollTo({ top: 0, left: 0, behavior: "instant" }); }
+      catch (err) { el.scrollTop = 0; el.scrollLeft = 0; }
+    });
+    var all = document.querySelectorAll("section, .stage, .page, .book, main, div");
+    for (var i = 0; i < all.length; i++) {
+      var el = all[i];
+      if (el.scrollTop) el.scrollTop = 0;
+      if (el.scrollLeft) el.scrollLeft = 0;
+    }
+    try { window.dispatchEvent(new Event("scroll")); } catch (e) {}
+    atEnd = null;
+    setTimeout(pushState, 120);
+  }
+
+  /* ---- 外壳指令 ---- */
+  window.addEventListener("message", function (e) {
+    var d = e.data;
+    if (!d || !d.type) return;
+    if (d.type === "leave") {
+      if (typeof window.__onLeave === "function") window.__onLeave();
+    } else if (d.type === "reset" || d.type === "enter" || d.type === "restart") {
+      resetAll();
+    }
+  });
+
+  /* ---- 载入即回到开头，避免上一板块的滚动惯性带进来 ---- */
+  window.addEventListener("load", function () {
+    resetAll();
+  });
+
+  [700, 1500, 2600, 4200].forEach(function (t) { setTimeout(pushState, t); });
+
+  /* 版式变化（图片加载完、字体回流）后重新判定 */
+  if (window.ResizeObserver) {
+    try {
+      var ro = new ResizeObserver(function () { onScroll(); });
+      ro.observe(document.documentElement);
+      if (document.body) ro.observe(document.body);
+    } catch (e) {}
+  }
+})();
+</script>
+
+</body>
+</html>
